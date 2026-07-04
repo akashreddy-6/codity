@@ -5,7 +5,7 @@ import { getSocket } from '../utils/socket';
 export class JobRetrier {
   static async handleFailure(job: Job, errorMsg: string): Promise<void> {
     const nextRetryCount = job.retryCount + 1;
-    let nextStatus = JobStatus.FAILED;
+    let nextStatus: JobStatus = JobStatus.FAILED;
     let runAt = new Date();
 
     if (nextRetryCount <= job.maxRetries) {
