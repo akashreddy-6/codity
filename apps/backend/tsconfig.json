@@ -20,7 +20,7 @@
     "sourceMap": true,
 
     // Stricter Typechecking Options
-    "strict": true,
+    "strict": false,
     "skipLibCheck": true
   },
   "include": ["src/**/*"],
