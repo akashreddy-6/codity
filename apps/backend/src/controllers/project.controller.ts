@@ -6,7 +6,7 @@ import { AuthRequest } from '../middleware/auth.middleware';
 export const createProject = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const validatedData = createProjectSchema.parse(req.body);
-    const organizationId = req.params.orgId;
+    const organizationId = req.params.orgId as string;
     const userId = req.user!.userId;
 
     // Verify user belongs to the organization
@@ -43,7 +43,7 @@ export const createProject = async (req: AuthRequest, res: Response): Promise<vo
 
 export const listProjects = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const organizationId = req.params.orgId;
+    const organizationId = req.params.orgId as string;
     const userId = req.user!.userId;
 
     // Verify user belongs to the organization
@@ -78,7 +78,7 @@ export const listProjects = async (req: AuthRequest, res: Response): Promise<voi
 
 export const deleteProject = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const projectId = req.params.id;
+    const projectId = req.params.id as string;
     const userId = req.user!.userId;
 
     const project = await prisma.project.findUnique({

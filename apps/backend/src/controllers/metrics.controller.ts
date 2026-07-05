@@ -4,7 +4,7 @@ import { AuthRequest } from '../middleware/auth.middleware';
 
 export const getMetrics = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const orgId = req.params.orgId;
+    const orgId = req.params.orgId as string;
     const userId = req.user!.userId;
 
     // Verify user belongs to the organization

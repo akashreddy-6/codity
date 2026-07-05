@@ -19,7 +19,7 @@ const verifyQueueAccess = async (userId: string, queueId: string) => {
 export const submitJob = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const validatedData = submitJobSchema.parse(req.body);
-    const queueId = req.params.queueId;
+    const queueId = req.params.queueId as string;
     const userId = req.user!.userId;
 
     const hasAccess = await verifyQueueAccess(userId, queueId);
@@ -29,7 +29,7 @@ export const submitJob = async (req: AuthRequest, res: Response): Promise<void> 
     }
 
     let runAt = new Date();
-    let status = JobStatus.QUEUED;
+    let status: JobStatus = JobStatus.QUEUED;
     
     if (validatedData.delayMs && validatedData.delayMs > 0) {
       runAt = new Date(Date.now() + validatedData.delayMs);
@@ -58,7 +58,7 @@ export const submitJob = async (req: AuthRequest, res: Response): Promise<void> 
 
 export const listJobs = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const queueId = req.params.queueId;
+    const queueId = req.params.queueId as string;
     const userId = req.user!.userId;
     const statusFilter = req.query.status as JobStatus | undefined;
     const skip = parseInt(req.query.skip as string) || 0;
@@ -91,7 +91,7 @@ export const listJobs = async (req: AuthRequest, res: Response): Promise<void> =
 
 export const getJobDetails = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const jobId = req.params.id;
+    const jobId = req.params.id as string;
     const userId = req.user!.userId;
 
     const job = await prisma.job.findUnique({

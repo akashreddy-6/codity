@@ -19,7 +19,7 @@ const verifyProjectAccess = async (userId: string, projectId: string) => {
 export const createQueue = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const validatedData = createQueueSchema.parse(req.body);
-    const projectId = req.params.projectId;
+    const projectId = req.params.projectId as string;
     const userId = req.user!.userId;
 
     const hasAccess = await verifyProjectAccess(userId, projectId);
@@ -49,7 +49,7 @@ export const createQueue = async (req: AuthRequest, res: Response): Promise<void
 
 export const listQueues = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const projectId = req.params.projectId;
+    const projectId = req.params.projectId as string;
     const userId = req.user!.userId;
 
     const hasAccess = await verifyProjectAccess(userId, projectId);
@@ -76,7 +76,7 @@ export const listQueues = async (req: AuthRequest, res: Response): Promise<void>
 
 export const pauseQueue = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const queueId = req.params.id;
+    const queueId = req.params.id as string;
     const userId = req.user!.userId;
 
     const queue = await prisma.queue.findUnique({ where: { id: queueId } });
@@ -104,7 +104,7 @@ export const pauseQueue = async (req: AuthRequest, res: Response): Promise<void>
 
 export const resumeQueue = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const queueId = req.params.id;
+    const queueId = req.params.id as string;
     const userId = req.user!.userId;
 
     const queue = await prisma.queue.findUnique({ where: { id: queueId } });
@@ -132,7 +132,7 @@ export const resumeQueue = async (req: AuthRequest, res: Response): Promise<void
 
 export const deleteQueue = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const queueId = req.params.id;
+    const queueId = req.params.id as string;
     const userId = req.user!.userId;
 
     const queue = await prisma.queue.findUnique({ where: { id: queueId } });
