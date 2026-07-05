@@ -44,25 +44,37 @@ export default function Projects() {
   };
 
   if (!orgId) {
-    return <div className="text-[var(--color-text-secondary)]">Please select an organization from the dashboard first.</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-[var(--color-text-secondary)]">
+        <Briefcase className="w-16 h-16 text-white/10 mb-4" />
+        <h2 className="text-xl font-medium text-white mb-2">No Organization Selected</h2>
+        <p>Please select an organization from the dashboard first.</p>
+        <Link to="/" className="mt-6 btn-primary">Go to Dashboard</Link>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-          <Briefcase className="h-8 w-8 text-[var(--color-brand-500)]" />
+    <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in duration-500">
+      <div className="relative">
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-[var(--color-accent-500)]/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <h1 className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70 flex items-center gap-4 relative z-10">
+          <div className="w-12 h-12 bg-gradient-to-br from-[var(--color-accent-500)]/20 to-[var(--color-brand-500)]/20 rounded-xl flex items-center justify-center border border-white/10">
+            <Briefcase className="h-6 w-6 text-[var(--color-accent-400)]" />
+          </div>
           Projects
         </h1>
-        <p className="mt-2 text-[var(--color-text-secondary)]">Manage projects and their associated job queues.</p>
+        <p className="mt-3 text-lg text-[var(--color-text-secondary)] font-medium">Manage projects and their associated job queues.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Create New Project Card */}
-        <div className="bg-[var(--color-bg-surface)] rounded-2xl border border-[var(--color-bg-elevated)] p-6 flex flex-col justify-center border-dashed hover:border-[var(--color-brand-500)] transition duration-200">
-          <form onSubmit={handleCreateProject} className="space-y-4">
+        <div className="glass-card p-6 flex flex-col justify-center border-dashed border-white/20 hover:border-[var(--color-brand-500)] hover:bg-white/[0.02]">
+          <form onSubmit={handleCreateProject} className="space-y-5">
             <h3 className="text-lg font-medium text-white flex items-center gap-2">
-              <Plus className="h-5 w-5 text-[var(--color-brand-500)]" />
+              <div className="bg-[var(--color-brand-500)]/20 p-2 rounded-lg">
+                <Plus className="h-5 w-5 text-[var(--color-brand-400)]" />
+              </div>
               New Project
             </h3>
             <input
@@ -70,42 +82,53 @@ export default function Projects() {
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.target.value)}
               placeholder="e.g. Email Service"
-              className="w-full px-4 py-2 bg-[var(--color-bg-elevated)] rounded-xl border-transparent focus:border-[var(--color-brand-500)] focus:ring-2 focus:ring-[var(--color-brand-500)] focus:ring-opacity-50 text-white transition duration-200"
+              className="input-field"
               required
             />
             <button
               type="submit"
               disabled={createProjectMutation.isPending}
-              className="w-full py-2 bg-[var(--color-brand-600)] hover:bg-[var(--color-brand-500)] rounded-xl text-white font-medium transition duration-200 disabled:opacity-50"
+              className="btn-primary w-full flex items-center justify-center gap-2"
             >
-              {createProjectMutation.isPending ? 'Creating...' : 'Create'}
+              {createProjectMutation.isPending ? 'Creating...' : 'Create Project'}
             </button>
           </form>
         </div>
 
         {/* List Projects */}
         {isLoading ? (
-          <div className="col-span-2 text-[var(--color-text-secondary)]">Loading projects...</div>
+          <div className="col-span-2 glass-card p-12 flex items-center justify-center">
+            <div className="animate-pulse flex flex-col items-center gap-4">
+              <div className="w-12 h-12 border-4 border-[var(--color-brand-500)] border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-[var(--color-text-secondary)] font-medium">Loading projects...</p>
+            </div>
+          </div>
         ) : (
-          projects?.map((project) => (
+          projects?.map((project, index) => (
             <Link
               to={`/queues?projectId=${project.id}`}
               key={project.id}
-              className="bg-[var(--color-bg-surface)] rounded-2xl border border-[var(--color-bg-elevated)] p-6 hover:border-[var(--color-brand-500)] hover:shadow-lg hover:shadow-blue-900/10 transition duration-200 group cursor-pointer flex flex-col"
+              className="glass-card p-6 group flex flex-col relative overflow-hidden"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="flex-1">
-                <div className="w-10 h-10 bg-[var(--color-brand-600)]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Layers className="h-5 w-5 text-[var(--color-brand-500)]" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[var(--color-accent-500)]/10 to-transparent rounded-full blur-2xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+              
+              <div className="flex-1 relative z-10">
+                <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mb-5 shadow-inner">
+                  <Layers className="h-6 w-6 text-white group-hover:text-[var(--color-accent-400)] transition-colors duration-300" />
                 </div>
-                <h3 className="text-xl font-bold text-white group-hover:text-[var(--color-brand-500)] transition">
+                <h3 className="text-2xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-[var(--color-accent-100)] transition-all duration-300">
                   {project.name}
                 </h3>
-                <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-                  {project._count.queues} {project._count.queues === 1 ? 'Queue' : 'Queues'}
-                </p>
+                <div className="mt-3 flex items-center gap-3">
+                  <span className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-sm font-medium text-[var(--color-text-secondary)]">
+                    {project._count.queues} {project._count.queues === 1 ? 'Queue' : 'Queues'}
+                  </span>
+                </div>
               </div>
-              <div className="mt-4 flex items-center text-sm font-medium text-[var(--color-brand-500)] opacity-0 group-hover:opacity-100 transition-opacity">
-                View Queues <ArrowRight className="ml-1 h-4 w-4" />
+              
+              <div className="mt-6 flex items-center text-sm font-semibold text-[var(--color-accent-400)] opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 relative z-10">
+                View Queues <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
           ))

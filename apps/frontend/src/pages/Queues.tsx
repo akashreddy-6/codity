@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams, Link } from 'react-router-dom';
 import api from '../services/api';
-import { Layers, Plus, ArrowRight, Play, Pause } from 'lucide-react';
+import { Layers, Plus, ArrowRight, Play, Pause, Activity } from 'lucide-react';
 
 interface Queue {
   id: string;
@@ -58,25 +58,37 @@ export default function Queues() {
   };
 
   if (!projectId) {
-    return <div className="text-[var(--color-text-secondary)]">Please select a project first.</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-[var(--color-text-secondary)]">
+        <Layers className="w-16 h-16 text-white/10 mb-4" />
+        <h2 className="text-xl font-medium text-white mb-2">No Project Selected</h2>
+        <p>Please select a project from the projects page first.</p>
+        <Link to="/projects" className="mt-6 btn-primary">Go to Projects</Link>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-          <Layers className="h-8 w-8 text-[var(--color-brand-500)]" />
-          Queues
+    <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in duration-500">
+      <div className="relative">
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <h1 className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70 flex items-center gap-4 relative z-10">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-[var(--color-brand-500)]/20 rounded-xl flex items-center justify-center border border-white/10">
+            <Layers className="h-6 w-6 text-emerald-400" />
+          </div>
+          Job Queues
         </h1>
-        <p className="mt-2 text-[var(--color-text-secondary)]">Manage your job queues and concurrency settings.</p>
+        <p className="mt-3 text-lg text-[var(--color-text-secondary)] font-medium">Manage priority queues, concurrency, and worker configuration.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Create New Queue Card */}
-        <div className="bg-[var(--color-bg-surface)] rounded-2xl border border-[var(--color-bg-elevated)] p-6 flex flex-col justify-center border-dashed hover:border-[var(--color-brand-500)] transition duration-200">
-          <form onSubmit={handleCreateQueue} className="space-y-4">
+        <div className="glass-card p-6 flex flex-col justify-center border-dashed border-white/20 hover:border-emerald-500/50 hover:bg-emerald-500/[0.02]">
+          <form onSubmit={handleCreateQueue} className="space-y-5">
             <h3 className="text-lg font-medium text-white flex items-center gap-2">
-              <Plus className="h-5 w-5 text-[var(--color-brand-500)]" />
+              <div className="bg-emerald-500/20 p-2 rounded-lg">
+                <Plus className="h-5 w-5 text-emerald-400" />
+              </div>
               New Queue
             </h3>
             <input
@@ -84,66 +96,80 @@ export default function Queues() {
               value={newQueueName}
               onChange={(e) => setNewQueueName(e.target.value)}
               placeholder="e.g. High Priority Emails"
-              className="w-full px-4 py-2 bg-[var(--color-bg-elevated)] rounded-xl border-transparent focus:border-[var(--color-brand-500)] focus:ring-2 focus:ring-[var(--color-brand-500)] focus:ring-opacity-50 text-white transition duration-200"
+              className="input-field focus:ring-emerald-500 focus:border-emerald-500"
               required
             />
             <button
               type="submit"
               disabled={createQueueMutation.isPending}
-              className="w-full py-2 bg-[var(--color-brand-600)] hover:bg-[var(--color-brand-500)] rounded-xl text-white font-medium transition duration-200 disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-medium py-2 px-4 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
             >
-              {createQueueMutation.isPending ? 'Creating...' : 'Create'}
+              {createQueueMutation.isPending ? 'Creating...' : 'Create Queue'}
             </button>
           </form>
         </div>
 
         {/* List Queues */}
         {isLoading ? (
-          <div className="col-span-2 text-[var(--color-text-secondary)]">Loading queues...</div>
+          <div className="col-span-2 glass-card p-12 flex items-center justify-center">
+            <div className="animate-pulse flex flex-col items-center gap-4">
+              <div className="w-12 h-12 border-4 border-[var(--color-brand-500)] border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-[var(--color-text-secondary)] font-medium">Loading queues...</p>
+            </div>
+          </div>
         ) : (
-          queues?.map((queue) => (
+          queues?.map((queue, index) => (
             <div
               key={queue.id}
-              className="bg-[var(--color-bg-surface)] rounded-2xl border border-[var(--color-bg-elevated)] p-6 hover:border-[var(--color-brand-500)] hover:shadow-lg hover:shadow-blue-900/10 transition duration-200 group flex flex-col relative"
+              className="glass-card p-6 group flex flex-col relative overflow-hidden"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="flex-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="w-10 h-10 bg-[var(--color-brand-600)]/20 rounded-xl flex items-center justify-center">
-                    <Layers className="h-5 w-5 text-[var(--color-brand-500)]" />
+              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${queue.isPaused ? 'from-amber-500/10' : 'from-emerald-500/10'} to-transparent rounded-full blur-2xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700`}></div>
+              
+              <div className="flex-1 relative z-10">
+                <div className="flex justify-between items-start mb-5">
+                  <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center shadow-inner">
+                    <Activity className={`h-6 w-6 transition-colors duration-300 ${queue.isPaused ? 'text-amber-500' : 'text-emerald-400'}`} />
                   </div>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
                       togglePauseMutation.mutate({ id: queue.id, isPaused: queue.isPaused });
                     }}
-                    className={`p-2 rounded-lg transition ${
+                    className={`p-2.5 rounded-xl transition-all duration-300 border shadow-sm ${
                       queue.isPaused 
-                        ? 'bg-amber-500/20 text-amber-500 hover:bg-amber-500/30' 
-                        : 'bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30'
+                        ? 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20 hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] hover:scale-110' 
+                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:scale-110'
                     }`}
                     title={queue.isPaused ? "Resume Queue" : "Pause Queue"}
                   >
-                    {queue.isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                    {queue.isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
                   </button>
                 </div>
                 
-                <h3 className="text-xl font-bold text-white transition flex items-center gap-2">
+                <h3 className="text-2xl font-bold text-white transition flex items-center gap-3">
                   {queue.name}
-                  {queue.isPaused && <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/30">Paused</span>}
+                  {queue.isPaused && (
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse-slow">
+                      PAUSED
+                    </span>
+                  )}
                 </h3>
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <div className="bg-[var(--color-bg-elevated)] p-3 rounded-xl">
-                    <p className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">Jobs</p>
-                    <p className="text-lg font-semibold text-white">{queue._count.jobs}</p>
+                
+                <div className="mt-5 grid grid-cols-2 gap-4">
+                  <div className="bg-black/20 border border-white/5 p-3.5 rounded-xl backdrop-blur-sm group-hover:bg-black/30 transition-colors duration-300">
+                    <p className="text-xs text-[var(--color-text-secondary)] font-medium uppercase tracking-wider mb-1">Total Jobs</p>
+                    <p className="text-xl font-bold text-white">{queue._count.jobs}</p>
                   </div>
-                  <div className="bg-[var(--color-bg-elevated)] p-3 rounded-xl">
-                    <p className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">Concurrency</p>
-                    <p className="text-lg font-semibold text-white">{queue.concurrencyLimit}</p>
+                  <div className="bg-black/20 border border-white/5 p-3.5 rounded-xl backdrop-blur-sm group-hover:bg-black/30 transition-colors duration-300">
+                    <p className="text-xs text-[var(--color-text-secondary)] font-medium uppercase tracking-wider mb-1">Workers</p>
+                    <p className="text-xl font-bold text-white">{queue.concurrencyLimit}</p>
                   </div>
                 </div>
               </div>
-              <Link to={`/jobs?queueId=${queue.id}`} className="mt-4 flex items-center text-sm font-medium text-[var(--color-brand-500)] hover:text-white transition">
-                View Jobs <ArrowRight className="ml-1 h-4 w-4" />
+              
+              <Link to={`/jobs?queueId=${queue.id}`} className="mt-6 flex items-center justify-end text-sm font-semibold text-emerald-400 opacity-80 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1 relative z-10 w-fit self-end">
+                Manage Jobs <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
             </div>
           ))
