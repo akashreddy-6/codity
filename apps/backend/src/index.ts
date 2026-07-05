@@ -41,12 +41,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-io.on('connection', (socket) => {
-  console.log(`Socket connected: ${socket.id}`);
-  socket.on('disconnect', () => {
-    console.log(`Socket disconnected: ${socket.id}`);
-  });
-});
+
 
 httpServer.listen(port, () => {
   console.log(`Backend server listening at http://localhost:${port}`);
