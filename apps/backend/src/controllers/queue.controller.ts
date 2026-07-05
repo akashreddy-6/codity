@@ -40,7 +40,8 @@ export const createQueue = async (req: AuthRequest, res: Response): Promise<void
     res.status(201).json(queue);
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      res.status(400).json({ error: 'Validation error', details: error.errors });
+      const firstError = error.issues?.[0]?.message || 'Validation error';
+      res.status(400).json({ error: firstError, details: error.issues });
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }
