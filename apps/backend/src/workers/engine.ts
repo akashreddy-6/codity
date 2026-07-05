@@ -5,22 +5,32 @@ import { JobExecutor } from './executor';
 export class WorkerEngine {
   private isRunning = false;
   private pollIntervalMs = 1000;
-  private workerId = 'system-worker-1'; // In a real app, this would be a UUID generated per instance
+  private workerId = 'system-worker-' + Math.random().toString(36).substring(7);
+  private dbWorkerId: string | null = null;
 
   async start() {
     if (this.isRunning) return;
     this.isRunning = true;
     
-    // Register worker in DB
-    let worker = await prisma.worker.findFirst({ where: { name: this.workerId } });
-    if (!worker) {
-      worker = await prisma.worker.create({
-        data: { name: this.workerId, status: 'ACTIVE' }
-      });
-    }
+    try {
+      // Register worker in DB
+      let worker = await prisma.worker.findFirst({ where: { name: this.workerId } });
+      if (!worker) {
+        worker = await prisma.worker.create({
+          data: { name: this.workerId, status: 'ACTIVE' }
+        });
+      }
+      
+      // Save the DB's UUID so heartbeats don't fail foreign key checks
+      this.dbWorkerId = worker.id;
 
-    console.log(`[WorkerEngine] Started polling...`);
-    this.poll();
+      console.log(`[WorkerEngine] Started polling...`);
+      this.poll();
+    } catch (error) {
+      console.error('[WorkerEngine] Startup failed, retrying in 5s...', error);
+      this.isRunning = false;
+      setTimeout(() => this.start(), 5000);
+    }
   }
 
   stop() {
@@ -45,8 +55,8 @@ export class WorkerEngine {
         });
 
         // 3. If we have capacity, try to claim a job
-        if (runningJobsCount < queue.concurrencyLimit) {
-          const claimedJob = await JobClaimer.claimNextJob(queue.id, workerId);
+        if (runningJobsCount < queue.concurrencyLimit && this.dbWorkerId) {
+          const claimedJob = await JobClaimer.claimNextJob(queue.id, this.dbWorkerId);
           if (claimedJob) {
             // Do NOT await execution here, we want it to run concurrently
             JobExecutor.execute(claimedJob);
@@ -55,9 +65,11 @@ export class WorkerEngine {
       }
 
       // Heartbeat
-      await prisma.workerHeartbeat.create({
-        data: { workerId: workerId }
-      });
+      if (this.dbWorkerId) {
+        await prisma.workerHeartbeat.create({
+          data: { workerId: this.dbWorkerId }
+        });
+      }
 
     } catch (error) {
       console.error('[WorkerEngine] Polling error:', error);
@@ -68,5 +80,4 @@ export class WorkerEngine {
   }
 }
 
-// Ensure workerId is globally accessible for this instance
-const workerId = 'worker-' + Math.random().toString(36).substring(7);
+

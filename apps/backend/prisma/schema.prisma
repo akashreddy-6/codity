@@ -69,6 +69,7 @@ model Queue {
   concurrencyLimit Int          @default(10)
   isPaused         Boolean      @default(false)
   jobs             Job[]
+  cronJobs         CronJob[]
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 }
@@ -148,4 +149,17 @@ model WorkerHeartbeat {
   worker      Worker   @relation(fields: [workerId], references: [id], onDelete: Cascade)
   metrics     Json?
   timestamp   DateTime @default(now())
+}
+
+model CronJob {
+  id              String       @id @default(uuid())
+  queueId         String
+  queue           Queue        @relation(fields: [queueId], references: [id], onDelete: Cascade)
+  cronExpression  String       // e.g. "0 * * * *"
+  payload         Json
+  priority        Int          @default(0)
+  lastRunAt       DateTime?
+  nextRunAt       DateTime?    // Pre-calculated next execution time
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }
