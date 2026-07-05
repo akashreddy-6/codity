@@ -36,6 +36,9 @@ export default function Queues() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['queues', projectId] });
       setNewQueueName('');
+    },
+    onError: (error: any) => {
+      alert(error.response?.data?.error || 'Failed to create queue');
     }
   });
 
@@ -47,6 +50,9 @@ export default function Queues() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['queues', projectId] });
+    },
+    onError: (error: any) => {
+      alert(error.response?.data?.error || 'Failed to toggle queue state');
     }
   });
 

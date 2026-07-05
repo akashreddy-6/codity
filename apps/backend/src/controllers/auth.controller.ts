@@ -32,7 +32,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      res.status(400).json({ error: 'Validation error', details: error.errors });
+      const firstError = error.errors[0]?.message || 'Validation error';
+      res.status(400).json({ error: firstError, details: error.errors });
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }
@@ -63,7 +64,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      res.status(400).json({ error: 'Validation error', details: error.errors });
+      const firstError = error.errors[0]?.message || 'Validation error';
+      res.status(400).json({ error: firstError, details: error.errors });
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }

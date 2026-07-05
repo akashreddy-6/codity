@@ -30,6 +30,9 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       setNewOrgName('');
+    },
+    onError: (error: any) => {
+      alert(error.response?.data?.error || 'Failed to create organization');
     }
   });
 

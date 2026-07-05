@@ -33,6 +33,9 @@ export default function Projects() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects', orgId] });
       setNewProjectName('');
+    },
+    onError: (error: any) => {
+      alert(error.response?.data?.error || 'Failed to create project');
     }
   });
 

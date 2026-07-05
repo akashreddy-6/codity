@@ -22,7 +22,8 @@ export const createOrganization = async (req: AuthRequest, res: Response): Promi
     res.status(201).json(organization);
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      res.status(400).json({ error: 'Validation error', details: error.errors });
+      const firstError = error.errors[0]?.message || 'Validation error';
+      res.status(400).json({ error: firstError, details: error.errors });
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }
