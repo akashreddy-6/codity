@@ -35,7 +35,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       const firstError = error.issues?.[0]?.message || 'Validation error';
       res.status(400).json({ error: firstError, details: error.issues });
     } else {
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 };
@@ -67,7 +67,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       const firstError = error.issues?.[0]?.message || 'Validation error';
       res.status(400).json({ error: firstError, details: error.issues });
     } else {
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 };
